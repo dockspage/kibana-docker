@@ -1,13 +1,13 @@
-FROM node:alpine
+## Stage 0: Prepare Kibana
+FROM node:alpine as builder
 
-# 1. Prepare: download 6.5.2 snapshot and strip node and node_modules,
-# but keep some kibana's monorepo @kbn modules first.
+# 1. Download 6.5.2-snapshot and strip node and node_modules
 RUN wget -qO- https://snapshots.elastic.co/downloads/kibana/kibana-oss-6.5.2-SNAPSHOT-linux-x86_64.tar.gz | tar xz
 
 RUN mv kibana-6.5.2-SNAPSHOT-linux-x86_64 kibana
 WORKDIR /kibana
 RUN mkdir packages
-# Keep the required modules built from from the monorepo
+# Keep the required modules built from  the monorepo
 RUN cp -R node_modules/\@kbn/config-schema/ packages/kbn-config-schema
 RUN cp -R node_modules/\@kbn/datemath/ packages/kbn-datemath
 RUN cp -R node_modules/\@kbn/i18n/ packages/kbn-i18n
@@ -22,21 +22,24 @@ ADD contrib/yarn.lock yarn.lock
 # 3. Download and install node_modules.
 RUN yarn
 
-WORKDIR /
+# 4. Patch the source code:
+# remove Optimize mixin and __REPLACE_WITH_PUBLIC_PATH__
+ADD build/server/kbn_server.js src/server/kbn_server.js
+RUN find optimize -type f -exec sed -i -e 's/__REPLACE_WITH_PUBLIC_PATH__//g' {} \;
+
+# STAGE 2: Setup Proxy
+FROM node:alpine
+COPY --from=builder kibana kibana
 
 ADD package.json .
 ADD yarn.lock .
 RUN yarn
 
-# 3.0 Add The Login Screen
+# Add The Login Screen
 ADD static static
 
-# 4. Patch The Source Code: remove Optimize mixin and __REPLACE_WITH_PUBLIC_PATH__
-ADD build/server/kbn_server.js kibana/src/server/kbn_server.js
-RUN find kibana/optimize -type f -exec sed -i -e 's/__REPLACE_WITH_PUBLIC_PATH__//g' {} \;
-
 ADD build build/cli.js
-ADD build proxy-server/cli.js
+ADD build build/proxy-server.js
 
 ENV NODE_ENV production
 
