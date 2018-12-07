@@ -17,9 +17,9 @@ RUN rm -rf node node_modules
 
 # 2. Patch the source code:
 # (1) remove Optimize mixin
-ADD build/src/server/kbn_server.js src/server/kbn_server.js
+ADD build/server/kbn_server.js src/server/kbn_server.js
 # (2) remove setup-node-env
-ADD build/src/cli/index.js src/cli/index.js
+ADD build/cli/index.js src/cli/index.js
 
 # 3. Add the package.json and yarn.lock files that we've generated.
 ADD contrib/package.json package.json
