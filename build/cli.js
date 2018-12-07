@@ -1,5 +1,6 @@
-// This is just the script to run kibana node build/cli
-// can't just with alamode because of args parsing
+/**
+ * Runs proxy server and CLI from kibana/src/cli/cli.
+ */
 const proxyServer = require('./proxy-server');
 
 const PROD = process.env.NODE_ENV == 'production'
