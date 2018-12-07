@@ -61,3 +61,5 @@ typings/
 .next
 kibana
 kibana-*.tar.gz
+# this is already in kibana, we just mock it
+build/cli/cli.js
