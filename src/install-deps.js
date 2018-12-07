@@ -56,7 +56,7 @@ async function run() {
   const isScoped = r.startsWith('@')
   if (!isScoped) r = rr
   console.log(
-    'MISSING %s%s in %s', r, !isScoped && (r != rr) ? ` (import ${rr})` : '',
+    'MISSING %s%s in %s', c(r, 'red'), !isScoped && (r != rr) ? ` (import ${rr})` : '',
     c(file, 'grey'),
   )
   const version = DD[r]

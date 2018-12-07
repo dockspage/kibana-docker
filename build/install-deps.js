@@ -2,6 +2,7 @@ let spawn = require('spawncommand'); const { fork } = spawn; if (spawn && spawn.
 const { relative } = require('path');
 const { dependencies, devDependencies } = require('./kibana.json');
 const { c } = require('erte');
+let loading = require('indicatrix'); if (loading && loading.__esModule) loading = loading.default;
 
 const DD = { ...dependencies, ...devDependencies }
 
@@ -14,16 +15,18 @@ const getFile = (err) => {
   return `${p}:${line}:${col}`
 }
 async function run() {
-  const f = fork('src/cli', [], {
+  const f = fork('src/cli', ['-e', 'http://unknown-host.test'], {
     stdio: 'pipe',
     execArgv: [], // eternal debug
     cwd: 'kibana',
   })
+  let started = false
   const P = new Promise((re) => {
     f.stdout.on('data', d => {
-      if (/log/.test(d)) {
+      if (/No living connections/.test(d)) {
         re({ stdout: '' })
         console.log('Server started.')
+        started = 1
         f.kill()
       }
     })
@@ -34,14 +37,18 @@ async function run() {
   ])
   let [,r] = /Cannot find module '(.+?)'/.exec(res.stderr) || []
   if (!r) {
-    console.log('Error didn\'t happen (server started?)')
+    if (!started) {
+      console.log('No error in stderr.')
+      throw new Error('Server was not started.')
+    }
     return
   }
   let file = getFile(res.stderr)
   if (!file) try {
-    const { error: { stack } } = JSON.parse(res.stdout)
+    const lines = res.stdout.trim().split('\n')
+    const last = lines[lines.length - 1]
+    const { error: { stack } } = JSON.parse(last)
     file = getFile(stack)
-    debugger
   } catch (err) {
     throw new Error('Could not find the file.')
   }
@@ -49,15 +56,15 @@ async function run() {
   const isScoped = r.startsWith('@')
   if (!isScoped) r = rr
   console.log(
-    'MISSING %s%s in %s', r, !isScoped && (r != rr) ? ` (import ${rr})` : '',
+    'MISSING %s%s in %s', c(r, 'red'), !isScoped && (r != rr) ? ` (import ${rr})` : '',
     c(file, 'grey'),
   )
   const version = DD[r]
   if (!version) throw new Error('Unknown version')
   const exact = `${r}@${version}`
-  console.log(' yarn add -E %s', c(exact, 'green'))
   const p = spawn('yarn', ['add', '-E', exact], { cwd: 'kibana' })
-  const rres = await p.promise
+  const t = ` yarn add -E ${c(exact, 'green')}`
+  const rres = await loading(t, p.promise)
   if (rres.code != 0) throw new Error(rres.stderr)
   await run()
 }
