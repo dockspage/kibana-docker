@@ -1,5 +1,5 @@
 import spawn, { fork } from 'spawncommand'
-import { dependencies, devDependencies } from './kibana-package.json'
+import { dependencies, devDependencies } from './kibana.json'
 
 const DD = { ...dependencies, ...devDependencies }
 

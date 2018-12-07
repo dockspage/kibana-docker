@@ -9,3 +9,5 @@ RUN cp -R node_modules/\@kbn/datemath/ packages/kbn-datemath
 RUN cp -R node_modules/\@kbn/i18n/ packages/kbn-i18n
 RUN rm -rf packages/kbn-config-schema/src packages/kbn-datemath/src packages/i18n/src
 RUN rm -rf node node_modules
+ADD build /
+RUN node /build/install-deps
