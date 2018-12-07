@@ -46,9 +46,10 @@ async function run() {
     throw new Error('Could not find the file.')
   }
   const rr = r.split('/', 1)
-  if (!r.startsWith('@')) r = rr
+  const isScoped = r.startsWith('@')
+  if (!isScoped) r = rr
   console.log(
-    'MISSING %s%s in %s', r, r != rr ? ` (import ${rr})` : '',
+    'MISSING %s%s in %s', r, !isScoped && (r != rr) ? ` (import ${rr})` : '',
     c(file, 'grey'),
   )
   const version = DD[r]
