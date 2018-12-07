@@ -1,0 +1,17 @@
+{
+  "devDependencies": {
+    "alamode": "1.6.0",
+    "reloquent": "1.2.3",
+    "spawncommand": "2.1.0"
+  },
+  "scripts": {
+    "build": "alamode src -o build -s"
+  },
+  "name": "kibana-docker",
+  "version": "6.5.2",
+  "description": "The Service Package To Create The Kibana With Authorisation Build.",
+  "main": "index.js",
+  "repository": "git@github.com:dockspage/kibana-docker.git",
+  "author": "Anton <anton@adc.sh>",
+  "license": "MIT"
+}
