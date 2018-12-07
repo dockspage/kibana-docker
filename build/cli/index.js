@@ -26,5 +26,5 @@ const PROD = process.env.NODE_ENV == 'production'
     'Proxy started on %s%s', url,
     PROD ? ' in production mode' : ''
   )
-  require('./cli')
+  require(PROD ? './cli' : '../../kibana/src/cli')
 })()
