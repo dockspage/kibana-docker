@@ -7,7 +7,7 @@
   "scripts": {
     "build": "alamode src -o build -s",
     "dev": "node src",
-    "install-deps": "node build/install-deps"
+    "install-deps": "node src src/install-deps"
   },
   "name": "kibana-docker",
   "version": "6.5.2",

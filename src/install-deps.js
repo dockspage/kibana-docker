@@ -14,16 +14,18 @@ const getFile = (err) => {
   return `${p}:${line}:${col}`
 }
 async function run() {
-  const f = fork('src/cli', [], {
+  const f = fork('src/cli', ['-e', 'http://unknown-host.test'], {
     stdio: 'pipe',
     execArgv: [], // eternal debug
     cwd: 'kibana',
   })
+  let started = false
   const P = new Promise((re) => {
     f.stdout.on('data', d => {
-      if (/log/.test(d)) {
+      if (/No living connections/.test(d)) {
         re({ stdout: '' })
         console.log('Server started.')
+        started = 1
         f.kill()
       }
     })
@@ -34,14 +36,18 @@ async function run() {
   ])
   let [,r] = /Cannot find module '(.+?)'/.exec(res.stderr) || []
   if (!r) {
-    console.log('Error didn\'t happen (server started?)')
+    if (!started) {
+      console.log('No error in stderr.')
+      throw new Error('Server was not started.')
+    }
     return
   }
   let file = getFile(res.stderr)
   if (!file) try {
-    const { error: { stack } } = JSON.parse(res.stdout)
+    const lines = res.stdout.trim().split('\n')
+    const last = lines[lines.length - 1]
+    const { error: { stack } } = JSON.parse(last)
     file = getFile(stack)
-    debugger
   } catch (err) {
     throw new Error('Could not find the file.')
   }
