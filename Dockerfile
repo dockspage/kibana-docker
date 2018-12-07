@@ -44,4 +44,4 @@ ADD build/proxy-server.js build/proxy-server.js
 ENV NODE_ENV production
 
 # Same entrypoint as prev version.
-ENTRYPOINT node build/cli -e http://$ELASTIC_SEARCH:9200
+ENTRYPOINT node build/cli -e http://$ELASTIC_SEARCH:9200 -q
