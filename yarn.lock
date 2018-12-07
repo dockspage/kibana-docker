@@ -111,6 +111,11 @@ erte@1.1.4:
   dependencies:
     diff "3.5.0"
 
+indicatrix@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/indicatrix/-/indicatrix-1.0.0.tgz#c8a688b91d051b7a4c311607a802dc813dc93daf"
+  integrity sha512-YYWzYbrLl7ub8AfNjp5/SLwdTN0BYyok4xcWVNOhgOFrpT+OZkh8k/j/daDBO2koqxGbjQ1hKby5j5wNKtPthw==
+
 makepromise@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/makepromise/-/makepromise-2.0.0.tgz#3b91b9de3e36cd6979c94c38392f04ba4d8e1f18"

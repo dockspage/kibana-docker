@@ -2,6 +2,7 @@
   "devDependencies": {
     "alamode": "1.6.0",
     "erte": "1.1.4",
+    "indicatrix": "1.0.0",
     "spawncommand": "2.1.0"
   },
   "scripts": {

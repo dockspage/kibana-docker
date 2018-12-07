@@ -2,6 +2,7 @@ import spawn, { fork } from 'spawncommand'
 import { relative } from 'path'
 import { dependencies, devDependencies } from './kibana.json'
 import { c } from 'erte'
+import loading from 'indicatrix'
 
 const DD = { ...dependencies, ...devDependencies }
 
@@ -61,9 +62,9 @@ async function run() {
   const version = DD[r]
   if (!version) throw new Error('Unknown version')
   const exact = `${r}@${version}`
-  console.log(' yarn add -E %s', c(exact, 'green'))
   const p = spawn('yarn', ['add', '-E', exact], { cwd: 'kibana' })
-  const rres = await p.promise
+  const t = ` yarn add -E ${c(exact, 'green')}`
+  const rres = await loading(t, p.promise)
   if (rres.code != 0) throw new Error(rres.stderr)
   await run()
 }
