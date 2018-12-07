@@ -38,8 +38,8 @@ RUN yarn
 # Add The Login Screen
 ADD static static
 
-ADD build build/cli.js
-ADD build build/proxy-server.js
+ADD build/cli.js build/cli.js
+ADD build/proxy-server.js build/proxy-server.js
 
 ENV NODE_ENV production
 
