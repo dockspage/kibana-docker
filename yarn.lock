@@ -125,18 +125,6 @@ pirates@4.0.0:
   dependencies:
     node-modules-regexp "^1.0.0"
 
-promto@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/promto/-/promto-1.0.1.tgz#0a169fc7bd8f48cef1ee9faeace61a100305a536"
-  integrity sha1-Chafx72PSM7x7p+urOYaEAMFpTY=
-
-reloquent@1.2.3:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/reloquent/-/reloquent-1.2.3.tgz#d6f8aec7bbf13c4acee61973f09b40ce34c860bf"
-  integrity sha512-ArNXaQQicvG/ZgccVV0N29HyzkiCATNBwV3Y0GBI/bHoj/oLaEzUHE3c6RPVSmudAGvc9+hUhpDiDB/EDATymg==
-  dependencies:
-    promto "1.0.1"
-
 restream@3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/restream/-/restream-3.1.1.tgz#36084997bd3e765c2da484700e16b850c2f9ffb4"

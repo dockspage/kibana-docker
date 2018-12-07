@@ -1,11 +1,11 @@
 {
   "devDependencies": {
     "alamode": "1.6.0",
-    "reloquent": "1.2.3",
     "spawncommand": "2.1.0"
   },
   "scripts": {
-    "build": "alamode src -o build -s"
+    "build": "alamode src -o build -s",
+    "install-deps": "node build/install-deps"
   },
   "name": "kibana-docker",
   "version": "6.5.2",
