@@ -1,13 +1,16 @@
 {
   "devDependencies": {
+    "@idio/core": "1.0.2",
     "alamode": "1.6.0",
     "erte": "1.1.4",
     "indicatrix": "1.0.0",
+    "koa-better-http-proxy": "0.2.4",
     "spawncommand": "2.1.0"
   },
   "scripts": {
     "build": "alamode src -o build -s",
     "dev": "node src",
+    "proxy": "node src src/proxy-server",
     "install-deps": "node src src/install-deps"
   },
   "name": "kibana-docker",
