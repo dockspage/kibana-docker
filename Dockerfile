@@ -33,7 +33,7 @@ COPY --from=builder kibana kibana
 
 ADD package.json .
 ADD yarn.lock .
-RUN yarn
+RUN yarn --production
 
 # Add The Login Screen
 ADD static static

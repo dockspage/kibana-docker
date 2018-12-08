@@ -1,6 +1,8 @@
 # kibana-docker
 The Shell Commands And Node Scripts Used To Create The Artdeco/Kibana Image In A Dockerfile.
 
+![finder](doc/finder.gif)
+
 ## Dockerfile
 
 We use the *Multi-Stage Build* to create an optimized version of the image.
@@ -41,18 +43,18 @@ COPY --from=builder kibana kibana
 
 ADD package.json .
 ADD yarn.lock .
-RUN yarn
+RUN yarn --production
 
 # Add The Login Screen
 ADD static static
 
-ADD build build/cli.js
-ADD build build/proxy-server.js
+ADD build/cli.js build/cli.js
+ADD build/proxy-server.js build/proxy-server.js
 
 ENV NODE_ENV production
 
 # Same entrypoint as prev version.
-ENTRYPOINT node build/cli -e http://$ELASTIC_SEARCH:9200
+ENTRYPOINT node build/cli -e http://$ELASTIC_SEARCH:9200 -q
 ```
 
 ## Development Version
@@ -61,17 +63,16 @@ The dev environment can be set-up by downloading the [snapshot Kibana](https://s
 
 ## Taken From Source
 
-- [x] To find out the exact required dependencies' versions, the [kibana/v6.5.2/package.json](https://raw.githubusercontent.com/elastic/kibana/v6.5.2/package.json) file is taken from GitHub.
-- [x] The `src/server/kbn_server.js` and `src/cli/index.js` are updated to remove Optimize mixing and the `setup-node-env` require.
+- [x] To find out the exact required dependencies' versions, the [kibana/v6.5.2/package.json](https://raw.githubusercontent.com/elastic/kibana/v6.5.2/package.json) file is taken from GitHub and put in th `src` as `kibana.json` for the use by `install-deps.js`.
+- [x] The `src/server/kbn_server.js` is updated to remove the Optimize mixin.
 
-### Tools
-
-## `install-deps`
+## The `install-deps` Tool
 
 The tool is used to find all missing dependencies by attempting to start the server, and failing, and extracting the missing module name and the file location where the error happened to display in CLI.
 
 ![install-deps running](doc/tool.gif)
 
+<!--
 ## `verify-versions`
 
-This tool will fetch the `package.json` from GitHub, and compare the versions in the Kibana's `package.json` against the online values. The verification step can be required to make sure that there are no rogue dependencies in this image.
+This tool will fetch the `package.json` from GitHub, and compare the versions in the Kibana's `package.json` against the online values. The verification step can be required to make sure that there are no rogue dependencies in this image. -->
