@@ -47,8 +47,13 @@ async function run() {
   if (!file) try {
     const lines = res.stdout.trim().split('\n')
     const last = lines[lines.length - 1]
-    const { error: { stack } } = JSON.parse(last)
-    file = getFile(stack)
+    let m
+    try {
+      ({ error: { stack: m } } = JSON.parse(last))
+    } catch (err) {
+      ({ message: m } = JSON.parse(last))
+    }
+    file = getFile(m)
   } catch (err) {
     throw new Error('Could not find the file.')
   }

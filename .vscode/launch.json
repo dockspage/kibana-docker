@@ -14,8 +14,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Install Deps",
-      "program": "${workspaceFolder}/src/index.js",
-      "args": ["src/install-deps"],
+      "program": "${workspaceFolder}/install-deps/index.js",
       "skipFiles": [
         "<node_internals>/**/*.js"
       ],

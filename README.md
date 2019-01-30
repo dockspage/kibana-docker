@@ -6,7 +6,7 @@ The problem with the official _Kibana_ image is that it contains all `node_modul
 
 The image also adds an authorisation level by running an http proxy server to access _Kibana_.
 
-![finder](doc/finder.gif)
+<!-- ![finder](doc/finder.gif) -->
 
 ## Dockerfile
 
@@ -62,11 +62,49 @@ ENV NODE_ENV production
 ENTRYPOINT node build/cli -e http://$ELASTIC_SEARCH:9200 -q
 ```
 
-## Development Version
+## Development Version & Preparing
 
-The dev environment for reproduction locally can be set-up by downloading the [snapshot Kibana](https://snapshots.elastic.co/downloads/kibana/kibana-oss-6.6.0-SNAPSHOT-linux-x86_64.tar.gz) and extracting it to the `kibana` directory. This will emulate Docker downloading it for us. There are 2 important steps to take:
-- Then, the `kibana/src/server/kbn_server.js` needs to be updated with the patched version that removes the _Optimize_ plugin from `build/server/kbn_server.js`.
-- 9 vendor files from `kibana/optimize` need `__REPLACE_WITH_PUBLIC_PATH__` replaced to an empty string.
+The dev environment for reproduction locally can be set-up by downloading the [snapshot Kibana](https://snapshots.elastic.co/downloads/kibana/kibana-oss-6.6.0-SNAPSHOT-linux-x86_64.tar.gz) and extracting it to the `kibana` directory. This will emulate Docker downloading it for us. Next, there are the following preparation steps.
+
+### Link Internal Packages
+
+There are internal packages that need to be linked. Copy them internal packages in the same way as the `Dockerfile` does, that is create `kibana/packages` and run
+
+```sh
+cp -R kibana/node_modules/\@kbn/config-schema kibana/packages/kbn-config-schema
+cp -R kibana/node_modules/\@kbn/i18n kibana/packages/kbn-i18n
+cp -R kibana/node_modules/\@kbn/interpreter kibana/packages/interpreter
+# Add linked the packages from the kibana dir
+cd kibana;
+yarn add link:packages/kbn-config-schema link:packages/kbn-i18n link:packages/kbn-interpreter/
+```
+
+### Built `Interpreter` Package
+
+The `interpreter` package needs to be rebuilt without `babel-runtime` for which we can use ÀLaMode.
+
+```sh
+node_modules/.bin/alamode kibana/packages/kbn-interpreter/src/common/lib/functions_registry.js -o kibana/packages/kbn-interpreter/target/common/lib -s
+node_modules/.bin/alamode kibana/packages/kbn-interpreter/src/common/lib/registry.js -o kibana/packages/kbn-interpreter/target/common/lib -s
+node_modules/.bin/alamode kibana/packages/kbn-interpreter/src/common/lib/fn.js -o kibana/packages/kbn-interpreter/target/common/lib -s
+node_modules/.bin/alamode kibana/packages/kbn-interpreter/src/common/lib/types_registry.js -o kibana/packages/kbn-interpreter/target/common/lib -s
+node_modules/.bin/alamode kibana/packages/kbn-interpreter/src/common/lib/get_type.js -o kibana/packages/kbn-interpreter/target/common/lib -s
+node_modules/.bin/alamode kibana/packages/kbn-interpreter/src/common/interpreter/interpret.js -o kibana/packages/kbn-interpreter/target/common/interpreter/
+node_modules/.bin/alamode kibana/packages/kbn-interpreter/src/common/lib/ast.js -o kibana/packages/kbn-interpreter/target/common/lib
+node_modules/.bin/alamode kibana/packages/kbn-interpreter/src/common/lib/grammar.js -o kibana/packages/kbn-interpreter/target/common/lib
+node_modules/.bin/alamode kibana/packages/kbn-interpreter/src/server/get_plugin_paths.js -o kibana/packages/kbn-interpreter/target/server/
+```
+Because the plugin's frontend is built separately, it should not affect the workings of _Kibana_. This could probably be done in one command, but the method to figure out which files need to be built is to try run the `install-deps` and see where it failed.
+
+### Add Patched `kbn_server`
+
+Then, the `kibana/src/server/kbn_server.js` needs to be updated with the patched version that removes the _Optimize_ plugin from `build/server/kbn_server.js`.
+
+### Update Vendor's Public Path
+
+9 vendor files from `kibana/optimize` need `__REPLACE_WITH_PUBLIC_PATH__` replaced to an empty string.
+
+### Entry point
 
 Our `build/cli.js` is a substitute to `kibana/src/cli/index.js` that skips babel setup. It will start the _Kibana_ server and the proxy server and it is the entry point of the application invoked with `yarn start`.
 

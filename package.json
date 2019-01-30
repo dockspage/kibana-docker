@@ -4,7 +4,7 @@
     "koa-better-http-proxy": "0.2.4"
   },
   "devDependencies": {
-    "alamode": "1.7.1",
+    "alamode": "1.7.2",
     "erte": "1.1.6",
     "indicatrix": "1.0.0",
     "spawncommand": "2.1.0"
