@@ -11,7 +11,7 @@
   },
   "scripts": {
     "start": "node build/cli",
-    "build": "alamode src -o build -s",
+    "build": "alamode src -o build -s -i kibana.json",
     "dev": "node src",
     "proxy": "node src src/proxy-server",
     "install-deps": "node src src/install-deps"
