@@ -11,13 +11,13 @@
   },
   "scripts": {
     "start": "node build/cli",
-    "build": "alamode src -o build -s -i kibana.json",
-    "dev": "node src",
+    "build": "alamode src -o build -s -i README.md,index.js",
+    "dev": "node src src/cli",
     "proxy": "node src src/proxy-server",
-    "install-deps": "node src src/install-deps"
+    "install-deps": "node install-deps"
   },
   "name": "kibana-docker",
-  "version": "6.5.2",
+  "version": "6.6.0",
   "description": "The Service Package To Create The Kibana With Authorisation Build.",
   "main": "index.js",
   "repository": "git@github.com:dockspage/kibana-docker.git",

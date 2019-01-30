@@ -1,8 +1,8 @@
-let spawn = require('spawncommand'); const { fork } = spawn; if (spawn && spawn.__esModule) spawn = spawn.default;
-const { relative } = require('path');
-const { dependencies, devDependencies } = require('./kibana.json');
-const { c } = require('erte');
-let loading = require('indicatrix'); if (loading && loading.__esModule) loading = loading.default;
+import spawn, { fork } from 'spawncommand'
+import { relative } from 'path'
+import { dependencies, devDependencies } from './kibana.json'
+import { c } from 'erte'
+import loading from 'indicatrix'
 
 const DD = { ...dependencies, ...devDependencies }
 
@@ -15,7 +15,7 @@ const getFile = (err) => {
   return `${p}:${line}:${col}`
 }
 async function run() {
-  const f = fork('src/cli', ['-e', 'http://unknown-host.test'], {
+  const f = fork('src/cli/cli', ['-e', 'http://unknown-host.test'], {
     stdio: 'pipe',
     execArgv: [], // eternal debug
     cwd: 'kibana',

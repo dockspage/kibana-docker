@@ -1,5 +1,10 @@
 # kibana-docker
-The Shell Commands And Node Scripts Used To Create The Artdeco/Kibana Image In A Dockerfile.
+
+The Shell Commands And Node Scripts Used To Create The `artdeco/kibana` Image In A Dockerfile.
+
+The problem with the official _Kibana_ image is that it contains all `node_modules`, even the dev dependencies. In addition, the Webpack is so integrated into _Kibana_ that it is required in the production version also, however it does not do anything because the front-end bundles have been pre-compiled. This project removes all unnecessary Babel, React, Webpack & co evil from the distributed image by finding out what dependencies are really needed and thus producing the most minimal built that is not shameful to run in a container.
+
+The image also adds an authorisation level by running an http proxy server to access _Kibana_.
 
 ![finder](doc/finder.gif)
 
@@ -11,10 +16,10 @@ We use the *Multi-Stage Build* to create an optimized version of the image.
 ## Stage 0: Prepare Kibana
 FROM node:alpine as builder
 
-# 1. Download 6.5.2-snapshot and strip node and node_modules
-RUN wget -qO- https://snapshots.elastic.co/downloads/kibana/kibana-oss-6.5.2-SNAPSHOT-linux-x86_64.tar.gz | tar xz
+# 1. Download 6.6.0-snapshot and strip node and node_modules
+RUN wget -qO- https://snapshots.elastic.co/downloads/kibana/kibana-oss-6.6.0-SNAPSHOT-linux-x86_64.tar.gz | tar xz
 
-RUN mv kibana-6.5.2-SNAPSHOT-linux-x86_64 kibana
+RUN mv kibana-6.6.0-SNAPSHOT-linux-x86_64 kibana
 WORKDIR /kibana
 RUN mkdir packages
 # Keep the required modules built from  the monorepo
@@ -59,11 +64,15 @@ ENTRYPOINT node build/cli -e http://$ELASTIC_SEARCH:9200 -q
 
 ## Development Version
 
-The dev environment can be set-up by downloading the [snapshot Kibana](https://snapshots.elastic.co/downloads/kibana/kibana-oss-6.5.2-SNAPSHOT-linux-x86_64.tar.gz) and extracting it to the `kibana` directory. This will emulater Docker downloading it for us. Then, the `kibana/src/server/kbn_server.js` need to be updated, along with 3 files from `kibana/optimize` which need `__REPLACE_WITH_PUBLIC_PATH__` replaced to an empty string. The server and the proxy server can then be started with `build/cli`.
+The dev environment for reproduction locally can be set-up by downloading the [snapshot Kibana](https://snapshots.elastic.co/downloads/kibana/kibana-oss-6.6.0-SNAPSHOT-linux-x86_64.tar.gz) and extracting it to the `kibana` directory. This will emulate Docker downloading it for us. There are 2 important steps to take:
+- Then, the `kibana/src/server/kbn_server.js` needs to be updated with the patched version that removes the _Optimize_ plugin from `build/server/kbn_server.js`.
+- 9 vendor files from `kibana/optimize` need `__REPLACE_WITH_PUBLIC_PATH__` replaced to an empty string.
+
+Our `build/cli.js` is a substitute to `kibana/src/cli/index.js` that skips babel setup. It will start the _Kibana_ server and the proxy server and it is the entry point of the application invoked with `yarn start`.
 
 ## Taken From Source
 
-- [x] To find out the exact required dependencies' versions, the [kibana/v6.5.2/package.json](https://raw.githubusercontent.com/elastic/kibana/v6.5.2/package.json) file is taken from GitHub and put in th `src` as `kibana.json` for the use by `install-deps.js`.
+- [x] To find out the exact required dependencies' versions, the [kibana/v6.6.0/package.json](https://raw.githubusercontent.com/elastic/kibana/v6.6.0/package.json) file is taken from GitHub and put in th `src` as `kibana.json` for the use by `install-deps.js`.
 - [x] The `src/server/kbn_server.js` is updated to remove the Optimize mixin.
 
 ## The `install-deps` Tool

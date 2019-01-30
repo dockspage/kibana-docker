@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * Licensed to Elasticsearch B.V. under one or more contributor
  * license agreements. See the NOTICE file distributed with
@@ -16,15 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-const proxyServer = require('../proxy-server');
 
-const PROD = process.env.NODE_ENV == 'production'
-
-;(async () => {
-  const url = await proxyServer(PROD)
-  console.log(
-    'Proxy started on %s%s', url,
-    PROD ? ' in production mode' : ''
-  )
-  require('./cli')
-})()
+require('../setup_node_env');
+require('./cli');
