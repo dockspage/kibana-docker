@@ -22,8 +22,13 @@ async function run() {
   })
   let started = false
   const P = new Promise((re) => {
+    let metricsSeen = false
     f.stdout.on('data', d => {
-      if (/No living connections/.test(d)) {
+      try {
+        const { tags, state } = JSON.parse(d)
+        if (tags.includes('plugin:metrics@6.6.0') && state == 'green') metricsSeen = true
+      } catch (err) {/**/}
+      if (metricsSeen && /No living connections/.test(d)) {
         re({ stdout: '' })
         console.log('Server started.')
         started = 1
