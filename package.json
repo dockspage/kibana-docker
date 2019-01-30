@@ -1,11 +1,11 @@
 {
   "dependencies": {
-    "@idio/core": "1.0.2",
+    "@idio/core": "1.2.0",
     "koa-better-http-proxy": "0.2.4"
   },
   "devDependencies": {
-    "alamode": "1.6.0",
-    "erte": "1.1.4",
+    "alamode": "1.7.1",
+    "erte": "1.1.6",
     "indicatrix": "1.0.0",
     "spawncommand": "2.1.0"
   },
