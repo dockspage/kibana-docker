@@ -1,12 +1,29 @@
 /*
   Source:
-   https://github.com/elastic/kibana/blob/v6.5.2/src/server/kbn_server.js
+   https://github.com/elastic/kibana/blob/v6.6.0/src/server/kbn_server.js
   Description:
    This is the kbn_server modified to remove the Optimize mixin, that is responsible for starting Webpack. We will serve the optimized bundles ourselves using a Koa proxy server (required to rename __REPLACE_WITH_PUBLIC_PATH__ to '' in optimize bundles).
 */
+/*
+ * Licensed to Elasticsearch B.V. under one or more contributor
+ * license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright
+ * ownership. Elasticsearch B.V. licenses this file to you under
+ * the Apache License, Version 2.0 (the "License") you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 import { constant, once, compact, flatten } from 'lodash'
-import { fromNode } from 'bluebird'
 import { isWorker } from 'cluster'
 import { fromRoot, pkg } from '../utils'
 import { Config } from './config'
@@ -63,6 +80,9 @@ export default class KbnServer {
       // writes pid file
       pidMixin,
 
+      // scan translations dirs, register locale files, initialize i18n engine and define `server.getUiTranslations`
+      i18nMixin,
+
       // find plugins and set this.plugins and this.pluginSpecs
       Plugins.scanMixin,
 
@@ -71,7 +91,6 @@ export default class KbnServer {
 
       // setup this.uiExports and this.uiBundles
       uiMixin,
-      i18nMixin,
       indexPatternsMixin,
 
       // setup saved object routes
@@ -144,7 +163,7 @@ export default class KbnServer {
       return
     }
 
-    await fromNode(cb => this.server.stop(cb))
+    await this.server.stop()
   }
 
   async inject(opts) {
@@ -168,6 +187,6 @@ export default class KbnServer {
     }
     const plain = JSON.stringify(subset, null, 2)
     this.server.log(['info', 'config'], 'New logging configuration:\n' + plain)
-    this.server.plugins['even-better'].monitor.reconfigure(loggingOptions)
+    this.server.plugins['@elastic/good'].reconfigure(loggingOptions)
   }
 }
