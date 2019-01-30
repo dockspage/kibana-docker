@@ -16,7 +16,7 @@ let compose = require('koa-compose'); if (compose && compose.__esModule) compose
     },
     static: {
       use: true,
-      root: [prod ? '/static' : 'static', prod ? 'optimize' : 'kibana/optimize' ],
+      root: ['static', 'kibana/optimize'],
       maxage: prod ? 1000 * 60 * 60 * 24 : null,
     },
     bodyparser: {},
