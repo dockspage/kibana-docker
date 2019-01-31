@@ -6,6 +6,7 @@ let compose = require('koa-compose'); if (compose && compose.__esModule) compose
  * Starts the proxy server that servers /static and /kibana/optimize dirs.
  */
                async function startProxy(prod) {
+  const maxage = prod ? 1000 * 60 * 60 * 24 : null
   const port = process.env.PORT || 5000
   const { router, app, url,
     middleware: { bodyparser } } = await idioCore({
@@ -14,11 +15,11 @@ let compose = require('koa-compose'); if (compose && compose.__esModule) compose
       use: true,
       keys: [process.env.SESSION_KEY || 'local-key'],
     },
-    static: {
-      use: true,
-      root: ['static', 'kibana/optimize'],
-      maxage: prod ? 1000 * 60 * 60 * 24 : null,
-    },
+    static: [{ use: true, root: ['static', 'kibana/optimize'],
+      maxage,
+    }, { use: true, root: 'kibana/dlls', mount: '/dlls',
+      maxage,
+    }],
     bodyparser: {},
   }, { port })
   router.post('/auth', bodyparser, Login)

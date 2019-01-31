@@ -11,8 +11,10 @@
   },
   "scripts": {
     "start": "node build/cli",
-    "build": "alamode src -o build -s -i README.md,index.js",
+    "build": "alamode src -o build -s -i index.js",
     "dev": "node src src/cli",
+    "doc": "doc doc.md -o README.md",
+    "alamode": "alamode",
     "proxy": "node src src/proxy-server",
     "install-deps": "node install-deps"
   },

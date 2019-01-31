@@ -1,18 +1,18 @@
 ## Stage 0: Prepare Kibana
 FROM node:alpine as builder
 
-# 1. Download 6.5.2-snapshot and strip node and node_modules
-RUN wget -qO- https://snapshots.elastic.co/downloads/kibana/kibana-oss-6.5.2-SNAPSHOT-linux-x86_64.tar.gz | tar xz
+# 1. Download 6.6.0-snapshot and strip node and node_modules
+RUN wget -qO- https://snapshots.elastic.co/downloads/kibana/kibana-oss-6.6.0-SNAPSHOT-linux-x86_64.tar.gz | tar xz
 
-RUN mv kibana-6.5.2-SNAPSHOT-linux-x86_64 kibana
+RUN mv kibana-6.6.0-SNAPSHOT-linux-x86_64 kibana
 WORKDIR /kibana
 RUN mkdir packages
-# Keep the required modules built from  the monorepo
+# Keep the required modules built from the monorepo
 RUN cp -R node_modules/\@kbn/config-schema/ packages/kbn-config-schema
-RUN cp -R node_modules/\@kbn/datemath/ packages/kbn-datemath
+RUN cp -R node_modules/\@kbn/interpreter/ packages/kbn-interpreter
 RUN cp -R node_modules/\@kbn/i18n/ packages/kbn-i18n
 # Runnable code is in target therefore src is unrequired
-RUN rm -rf packages/kbn-config-schema/src packages/kbn-datemath/src packages/kbn-i18n/src
+RUN rm -rf packages/kbn-config-schema/src packages/kbn-i18n/src
 RUN rm -rf node node_modules
 
 # 2. Add the package.json and yarn.lock files that we've generated.
@@ -23,9 +23,15 @@ ADD contrib/yarn.lock yarn.lock
 RUN yarn
 
 # 4. Patch the source code:
-# remove Optimize mixin and __REPLACE_WITH_PUBLIC_PATH__
+ # - remove Optimize mixin and __REPLACE_WITH_PUBLIC_PATH__
 ADD build/server/kbn_server.js src/server/kbn_server.js
-RUN find optimize -type f -exec sed -i -e 's/__REPLACE_WITH_PUBLIC_PATH__//g' {} \;
+RUN find optimize dlls -type f -exec sed -i -e 's/__REPLACE_WITH_PUBLIC_PATH__//g' {} \;
+
+ # - patch the Interpreter plugin
+WORKDIR /
+RUN yarn alamode kibana/packages/kbn-interpreter/src/common/lib -o kibana/packages/kbn-interpreter/target/common/lib -s
+RUN yarn alamode kibana/packages/kbn-interpreter/src/common/interpreter/interpret.js -o kibana/packages/kbn-interpreter/target/common/interpreter -s
+RUN yarn alamode kibana/packages/kbn-interpreter/src/server/get_plugin_paths.js -o kibana/packages/kbn-interpreter/target/server -s
 
 # STAGE 2: Setup Proxy
 FROM node:alpine

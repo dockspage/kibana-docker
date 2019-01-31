@@ -2,23 +2,15 @@
 
 The Shell Commands And Node Scripts Used To Create The `artdeco/kibana` Image In A Dockerfile.
 
-- [Clean-up Of Dependnecies](#clean-up-of-dependnecies)
-- [Dockerfile](#dockerfile)
-- [Development Version & Preparing](#development-version--preparing)
-  * [Link Internal Packages](#link-internal-packages)
-  * [Built `Interpreter` Package](#built-interpreter-package)
-  * [Add Patched `kbn_server`](#add-patched-kbn_server)
-  * [Update Vendor's Public Path](#update-vendors-public-path)
-  * [Entry point](#entry-point)
-- [Taken From Source](#taken-from-source)
-- [The `install-deps` Tool](#the-install-deps-tool)
-- [Copyright](#copyright)
+%TOC%
 
 ## Clean-up Of Dependnecies
 
 The problem with the official _Kibana_ image is that it contains all `node_modules`, even the dev dependencies. In addition, the Webpack is so integrated into _Kibana_ that it is required in the production version also, however it does not do anything because the front-end bundles have been pre-compiled. This project removes all unnecessary Babel, React, Webpack & co evil from the distributed image by finding out what dependencies are really needed and thus producing the most minimal built that is not shameful to run in a container.
 
 The image also adds an authorisation level by running an http proxy server to access _Kibana_.
+
+<!-- ![finder](doc/finder.gif) -->
 
 ## Dockerfile
 
@@ -78,26 +70,11 @@ The tool is used to find all missing dependencies by attempting to start the ser
 
 ![install-deps running](doc/tool.gif)
 
+<!--
+## `verify-versions`
+
+This tool will fetch the `package.json` from GitHub, and compare the versions in the Kibana's `package.json` against the online values. The verification step can be required to make sure that there are no rogue dependencies in this image. -->
+
 ## Copyright
 
-<table>
-  <tr>
-    <th>
-      <a href="https://artd.eco">
-        <img src="https://raw.githubusercontent.com/wrote/wrote/master/images/artdeco.png" alt="Art Deco" />
-      </a>
-    </th>
-    <th>
-      © <a href="https://artd.eco">Art Deco</a>  
-      2019
-    </th>
-    <th>
-      <a href="https://www.technation.sucks" title="Tech Nation Visa">
-        <img src="https://raw.githubusercontent.com/artdecoweb/www.technation.sucks/master/anim.gif" alt="Tech Nation Visa" />
-      </a>
-    </th>
-    <th>
-      <a href="https://www.technation.sucks">Tech Nation Visa Sucks</a>
-    </th>
-  </tr>
-</table>
+<Footer/>
