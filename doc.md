@@ -16,7 +16,7 @@ The image also adds an authorisation level by running an http proxy server to ac
 
 We use the *Multi-Stage Build* to create an optimized version of the image.
 
-%EXAMPLE: Dockerfile, docker%
+%EXAMPLE: Dockerfile, Dockerfile%
 
 ## Development Version & Preparing
 

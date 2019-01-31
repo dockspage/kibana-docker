@@ -24,7 +24,7 @@ The image also adds an authorisation level by running an http proxy server to ac
 
 We use the *Multi-Stage Build* to create an optimized version of the image.
 
-```docker
+```Dockerfile
 ## Stage 0: Prepare Kibana
 FROM node:alpine as builder
 
