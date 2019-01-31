@@ -27,8 +27,10 @@ RUN yarn
 ADD build/server/kbn_server.js src/server/kbn_server.js
 RUN find optimize dlls -type f -exec sed -i -e 's/__REPLACE_WITH_PUBLIC_PATH__//g' {} \;
 
- # - patch the Interpreter plugin
+ # - patch the Interpreter plugin with ÀLaMode
 WORKDIR /
+ADD package.json package.json
+RUN yarn
 RUN yarn alamode kibana/packages/kbn-interpreter/src/common/lib -o kibana/packages/kbn-interpreter/target/common/lib -s
 RUN yarn alamode kibana/packages/kbn-interpreter/src/common/interpreter/interpret.js -o kibana/packages/kbn-interpreter/target/common/interpreter -s
 RUN yarn alamode kibana/packages/kbn-interpreter/src/server/get_plugin_paths.js -o kibana/packages/kbn-interpreter/target/server -s
