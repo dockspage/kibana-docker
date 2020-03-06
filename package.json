@@ -1,22 +1,22 @@
 {
   "dependencies": {
-    "@idio/core": "1.2.0",
     "koa-better-http-proxy": "0.2.4"
   },
   "devDependencies": {
-    "alamode": "1.7.2",
-    "erte": "1.1.6",
-    "indicatrix": "1.0.0",
-    "spawncommand": "2.1.0"
+    "alamode": "3.5.2",
+    "documentary": "^1.37.1",
+    "erte": "1.2.0",
+    "indicatrix": "1.4.1",
+    "spawncommand": "2.2.0"
   },
   "scripts": {
     "start": "node build/cli",
     "build": "alamode src -o build -s -i index.js",
     "dev": "node src src/cli",
-    "doc": "doc doc.md -o README.md",
+    "doc": "doc -o README.md",
     "alamode": "alamode",
     "proxy": "node src src/proxy-server",
-    "install-deps": "node install-deps"
+    "i": "alanode install-deps"
   },
   "name": "kibana-docker",
   "version": "6.6.0",

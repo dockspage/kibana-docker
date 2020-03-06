@@ -2,7 +2,9 @@
 
 The Shell Commands And Node Scripts Used To Create The `artdeco/kibana` Image In A Dockerfile.
 
-- [Clean-up Of Dependnecies](#clean-up-of-dependnecies)
+<a name="table-of-contents"></a>
+
+- [Clean-up Of Dependencies](#clean-up-of-dependencies)
 - [Dockerfile](#dockerfile)
 - [Development Version & Preparing](#development-version--preparing)
   * [Link Internal Packages](#link-internal-packages)
@@ -14,11 +16,21 @@ The Shell Commands And Node Scripts Used To Create The `artdeco/kibana` Image In
 - [The `install-deps` Tool](#the-install-deps-tool)
 - [Copyright](#copyright)
 
-## Clean-up Of Dependnecies
+<p align="center"><a href="#table-of-contents">
+  <img src="/.documentary/section-breaks/0.svg?sanitize=true">
+</a></p>
 
-The problem with the official _Kibana_ image is that it contains all `node_modules`, even the dev dependencies. In addition, the Webpack is so integrated into _Kibana_ that it is required in the production version also, however it does not do anything because the front-end bundles have been pre-compiled. This project removes all unnecessary Babel, React, Webpack & co evil from the distributed image by finding out what dependencies are really needed and thus producing the most minimal built that is not shameful to run in a container.
+## Clean-up Of Dependencies
+
+The problem with the official _Kibana_ image is that it contains all `node_modules`, even the dev dependencies. In addition, the Webpack is so integrated into _Kibana_ that it is required in the production version also, however it does not do anything because the front-end bundles have been pre-compiled. This project removes all unnecessary Babel, React, Webpack from the distributed image by finding out what dependencies are really needed and thus producing the most minimal built that can be run in a container.
 
 The image also adds an authorisation level by running an http proxy server to access _Kibana_.
+
+<p align="center"><a href="#table-of-contents">
+  <img src="/.documentary/section-breaks/1.svg?sanitize=true">
+</a></p>
+
+
 
 ## Dockerfile
 
@@ -82,21 +94,44 @@ ENV NODE_ENV production
 ENTRYPOINT node build/cli -e http://$ELASTIC_SEARCH:9200 -q
 ```
 
+<p align="center"><a href="#table-of-contents">
+  <img src="/.documentary/section-breaks/2.svg?sanitize=true">
+</a></p>
+
 ## Development Version & Preparing
 
-The dev environment for reproduction locally can be set-up by downloading the [snapshot Kibana](https://snapshots.elastic.co/downloads/kibana/kibana-oss-6.6.0-SNAPSHOT-linux-x86_64.tar.gz) and extracting it to the `kibana` directory. This will emulate Docker downloading it for us. Next, there are the following preparation steps.
+The dev environment for reproduction locally can be set-up by downloading the [snapshot Kibana] and extracting it to the `kibana` directory. This will emulate Docker downloading it for us. Next, there are the following preparation steps.
+
+> To get rid of unwanted modules, we will need to remove `node_modules` (rename it to `.node_modules`) and start running the install-deps script to pick up which dependency is missing.
+
+At first, Node process will throw `MODULE_NOT_FOUND` exception failing to start the program altogether, since because require calls won't be able to find the package. But later on, modules will be loaded dynamically as plugins, so we'll listen for console statements that indicate that a module is missing.
 
 ### Link Internal Packages
 
-There are internal packages that need to be linked. Copy them internal packages in the same way as the `Dockerfile` does, that is create `kibana/packages` and run
+There are internal packages that need to be linked, because they're not publicly published on NPM. Copy them in the same way as the `Dockerfile` does, that is create `kibana/packages` and run
 
 ```sh
-cp -R kibana/node_modules/\@kbn/config-schema kibana/packages/kbn-config-schema
-cp -R kibana/node_modules/\@kbn/i18n kibana/packages/kbn-i18n
-cp -R kibana/node_modules/\@kbn/interpreter kibana/packages/interpreter
+cp -R kibana/.node_modules/\@kbn/config-schema kibana/packages/kbn-config-schema
+cp -R kibana/.node_modules/\@kbn/i18n kibana/packages/kbn-i18n
+cp -R kibana/.node_modules/\@kbn/analytics kibana/packages/analytics
+cp -R kibana/.node_modules/\@kbn/interpreter kibana/packages/interpreter
 # Add linked the packages from the kibana dir
 cd kibana;
-yarn add link:packages/kbn-config-schema link:packages/kbn-i18n link:packages/kbn-interpreter/
+yarn add link:packages/kbn-config-schema \
+         link:packages/kbn-i18n \
+         link:packages/analytics
+```
+
+`@babel/runtime` dependency is present in kbn-interpreter which needs to be removed from `kibana/packages/kbn-interpreter/package.json`. The `@kbn/i18n` also needs to be added as a link in that package, otherwise it won't.
+
+```sh
+cd kibana/packages/kbn-interpreter
+yarn add link:../kbn-i18n
+```
+
+```sh
+cd kibana
+yarn add link:packages/kbn-interpreter
 ```
 
 ### Built `Interpreter` Package
@@ -125,8 +160,14 @@ Our `build/cli.js` is a substitute to `kibana/src/cli/index.js` that skips babel
 
 ## Taken From Source
 
-- [x] To find out the exact required dependencies' versions, the [kibana/v6.6.0/package.json](https://raw.githubusercontent.com/elastic/kibana/v6.6.0/package.json) file is taken from GitHub and put in the `install_deps` as `kibana.json` for the use by `install-deps.js`.
+- [x] To find out the exact required dependencies' versions, the [kibana/v7.6.1/package.json](https://raw.githubusercontent.com/elastic/kibana/v7.6.1/package.json) file is taken from _GitHub_ and put in the `install_deps` as `kibana.json` for the use by `install-deps.js`.
 - [x] The `src/server/kbn_server.js` is updated to remove the Optimize mixin.
+
+<p align="center"><a href="#table-of-contents">
+  <img src="/.documentary/section-breaks/3.svg?sanitize=true">
+</a></p>
+
+
 
 ## The `install-deps` Tool
 
@@ -134,26 +175,19 @@ The tool is used to find all missing dependencies by attempting to start the ser
 
 ![install-deps running](doc/tool.gif)
 
+
 ## Copyright
+
+[snapshot Kibana]: https://snapshots.elastic.co/downloads/kibana/kibana-oss-7.6.1-SNAPSHOT-linux-x86_64.tar.gz
 
 <table>
   <tr>
     <th>
-      <a href="https://artd.eco">
-        <img src="https://raw.githubusercontent.com/wrote/wrote/master/images/artdeco.png" alt="Art Deco" />
+      <a href="https://www.artd.eco">
+        <img width="100" src="https://raw.githubusercontent.com/wrote/wrote/master/images/artdeco.png"
+          alt="Art Deco">
       </a>
     </th>
-    <th>
-      © <a href="https://artd.eco">Art Deco</a>  
-      2019
-    </th>
-    <th>
-      <a href="https://www.technation.sucks" title="Tech Nation Visa">
-        <img src="https://raw.githubusercontent.com/artdecoweb/www.technation.sucks/master/anim.gif" alt="Tech Nation Visa" />
-      </a>
-    </th>
-    <th>
-      <a href="https://www.technation.sucks">Tech Nation Visa Sucks</a>
-    </th>
+    <th>© <a href="https://www.artd.eco">Art Deco™</a>   2020</th>
   </tr>
 </table>
