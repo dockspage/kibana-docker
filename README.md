@@ -2,6 +2,11 @@
 
 The Shell Commands And Node Scripts Used To Create The `artdeco/kibana` Image In A Dockerfile.
 
+> VERSION 7
+> Since 7, Kibana is hard-wired for Webpack because of the UI plugin. In my opinion, requiring a build tool to run your website, it bad. Time for our own Kibana.
+
+You can use branch 6 for when Kibana was an OK software.
+
 <a name="table-of-contents"></a>
 
 - [Clean-up Of Dependencies](#clean-up-of-dependencies)
@@ -9,7 +14,7 @@ The Shell Commands And Node Scripts Used To Create The `artdeco/kibana` Image In
 - [Development Version & Preparing](#development-version--preparing)
   * [Link Internal Packages](#link-internal-packages)
   * [Built `Interpreter` Package](#built-interpreter-package)
-  * [Add Patched `kbn_server`](#add-patched-kbn_server)
+  * [Patch `kbn_server`](#patch-kbn_server)
   * [Update Vendor's Public Path](#update-vendors-public-path)
   * [Entry point](#entry-point)
 - [Taken From Source](#taken-from-source)
@@ -113,13 +118,15 @@ There are internal packages that need to be linked, because they're not publicly
 ```sh
 cp -R kibana/.node_modules/\@kbn/config-schema kibana/packages/kbn-config-schema
 cp -R kibana/.node_modules/\@kbn/i18n kibana/packages/kbn-i18n
-cp -R kibana/.node_modules/\@kbn/analytics kibana/packages/analytics
-cp -R kibana/.node_modules/\@kbn/interpreter kibana/packages/interpreter
+cp -R kibana/.node_modules/\@kbn/analytics kibana/packages/kbn-analytics
+cp -R kibana/.node_modules/\@kbn/interpreter kibana/packages/kbn-interpreter
+cp -R kibana/.node_modules/\@kbn/ui-shared-deps kibana/packages/kbn-ui-shared-deps
 # Add linked the packages from the kibana dir
 cd kibana;
 yarn add link:packages/kbn-config-schema \
          link:packages/kbn-i18n \
-         link:packages/analytics
+         link:packages/kbn-analytics \
+         link:packages/kbn-ui-shared-deps \
 ```
 
 `@babel/runtime` dependency is present in kbn-interpreter which needs to be removed from `kibana/packages/kbn-interpreter/package.json`. The `@kbn/i18n` also needs to be added as a link in that package, otherwise it won't.
@@ -140,15 +147,19 @@ The `interpreter` package needs to be rebuilt without `babel-runtime` for which 
 
 ```sh
 yarn alamode kibana/packages/kbn-interpreter/src/common/lib -o kibana/packages/kbn-interpreter/target/common/lib -s
-yarn alamode kibana/packages/kbn-interpreter/src/common/interpreter/interpret.js -o kibana/packages/kbn-interpreter/target/common/interpreter -s
-yarn alamode kibana/packages/kbn-interpreter/src/server/get_plugin_paths.js -o kibana/packages/kbn-interpreter/target/server -s
 ```
 
 Because the plugin's frontend is pre-built separately, it should not affect the workings of _Kibana_. The method to figure out which files need to be built is to try run the `install-deps` and see where it failed.
 
-### Add Patched `kbn_server`
+### Patch `kbn_server`
 
-Then, the `kibana/src/server/kbn_server.js` needs to be updated with the patched version that removes the _Optimize_ plugin from `build/server/kbn_server.js`.
+There's an Optimize plugin that requires WebPack that we want to get rid of. It's loaded from **kibana/src/legacy/server/kbn_server.js**:
+
+```js
+/* 33 */ var _optimize = _interopRequireDefault(require("../../optimize"));
+```
+
+Just comment that out.
 
 ### Update Vendor's Public Path
 
