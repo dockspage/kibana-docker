@@ -25,7 +25,7 @@
     "hapi": "^17.5.3",
     "inert": "^5.1.0",
     "joi": "^13.5.2",
-    "js-yaml": "3.4.1",
+    "js-yaml": "3.13.1",
     "lodash": "npm:@elastic/lodash@3.10.1-kibana1",
     "moment": "^2.20.1",
     "moment-timezone": "^0.5.14",
