@@ -15,11 +15,13 @@ const getFile = (err) => {
   return `${p}:${line}:${col}`
 }
 async function run() {
-  const f = fork('src/cli/cli', ['-e', 'http://unknown-host.test'], {
-    stdio: 'pipe',
-    execArgv: [], // eternal debug
-    cwd: 'kibana',
-  })
+  const f = fork('src/cli/cli',
+    [], // ['-e', 'http://unknown-host.test'],
+    {
+      stdio: 'pipe',
+      execArgv: [], // eternal debug
+      cwd: 'kibana',
+    })
   let started = false
   const P = new Promise((re) => {
     let metricsSeen = false
