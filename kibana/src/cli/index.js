@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /*
  * Licensed to Elasticsearch B.V. under one or more contributor
@@ -18,6 +18,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+require('../apm')();
 
 require('../setup_node_env');
+
 require('./cli');
