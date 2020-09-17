@@ -43,7 +43,7 @@
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.27",
     "node-fetch": "1.7.3",
-    "node-forge": "^0.9.1",
+    "node-forge": "^0.10.0",
     "node-sass": "^4.9.4",
     "pegjs": "0.10.0",
     "postcss-url": "^8.0.0",
